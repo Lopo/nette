@@ -12,7 +12,7 @@
 namespace Nette\Config;
 
 use Nette,
-	Nette\Neon;
+	Nette\Utils\Neon;
 
 
 
@@ -21,7 +21,7 @@ use Nette,
  *
  * @author     Ondrej Hubsch
  */
-final class ConfigAdapterNeon implements IConfigAdapter
+final class NeonAdapter implements IAdapter
 {
 	/** @var string  section inheriting separator (section < parent) */
 	public static $sectionSeparator = ' < ';
@@ -44,7 +44,7 @@ final class ConfigAdapterNeon implements IConfigAdapter
 	 * Reads configuration from NEON file.
 	 * @param  string  file name
 	 * @return array
-	 * @throws \InvalidStateException
+	 * @throws Nette\InvalidStateException
 	 */
 	public static function load($file)
 	{
@@ -73,15 +73,15 @@ final class ConfigAdapterNeon implements IConfigAdapter
 						if (isset($cursor[$part]) && is_array($cursor[$part])) {
 							$cursor = & $cursor[$part];
 						} else {
-							throw new \InvalidStateException("Missing parent section $parent in '$file'.");
+							throw new Nette\InvalidStateException("Missing parent section $parent in '$file'.");
 						}
 					}
-					$secData = Nette\ArrayTools::mergeTree($secData, $cursor);
+					$secData = Nette\ArrayUtils::mergeTree($secData, $cursor);
 				}
 
 				$secName = trim($parts[0]);
 				if ($secName === '') {
-					throw new \InvalidStateException("Invalid empty section name in '$file'.");
+					throw new Nette\InvalidStateException("Invalid empty section name in '$file'.");
 				}
 			}
 
@@ -91,7 +91,7 @@ final class ConfigAdapterNeon implements IConfigAdapter
 					if (!isset($cursor[$part]) || is_array($cursor[$part])) {
 						$cursor = & $cursor[$part];
 					} else {
-						throw new \InvalidStateException("Invalid section [$secName] in '$file'.");
+						throw new Nette\InvalidStateException("Invalid section [$secName] in '$file'.");
 					}
 				}
 			} else {
@@ -99,7 +99,7 @@ final class ConfigAdapterNeon implements IConfigAdapter
 			}
 
 			if (is_array($secData) && is_array($cursor)) {
-				$secData = Nette\ArrayTools::mergeTree($secData, $cursor);
+				$secData = Nette\ArrayUtils::mergeTree($secData, $cursor);
 			}
 
 			$cursor = $secData;

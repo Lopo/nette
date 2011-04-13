@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Nette\Templates;
+namespace Nette\Caching;
 
 use Nette,
 	Nette\Environment,
@@ -22,7 +22,7 @@ use Nette,
  *
  * @author     David Grudl
  */
-class CachingHelper extends Nette\Object
+class OutputHelper extends Nette\Object
 {
 	/** @var array */
 	private $frame;
@@ -37,7 +37,7 @@ class CachingHelper extends Nette\Object
 	 * @param  string
 	 * @param  array of CachingHelper
 	 * @param  array
-	 * @return CachingHelper
+	 * @return OutputHelper
 	 */
 	public static function create($key, & $parents, $args = NULL)
 	{
@@ -101,7 +101,7 @@ class CachingHelper extends Nette\Object
 
 
 	/**
-	 * @return Nette\Caching\Cache
+	 * @return Cache
 	 */
 	protected static function getCache()
 	{

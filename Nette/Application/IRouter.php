@@ -30,17 +30,17 @@ interface IRouter
 
 	/**
 	 * Maps HTTP request to a PresenterRequest object.
-	 * @param  Nette\Web\IHttpRequest
-	 * @return PresenterRequest|NULL
+	 * @param  Nette\Http\IRequest
+	 * @return Request|NULL
 	 */
-	function match(Nette\Web\IHttpRequest $httpRequest);
+	function match(Nette\Http\IRequest $httpRequest);
 
 	/**
 	 * Constructs absolute URL from PresenterRequest object.
-	 * @param  PresenterRequest
-	 * @param  Nette\Web\Uri referential URI
+	 * @param  Request
+	 * @param  Nette\Http\Url referential URI
 	 * @return string|NULL
 	 */
-	function constructUrl(PresenterRequest $appRequest, Nette\Web\Uri $refUri);
+	function constructUrl(Request $appRequest, Nette\Http\Url $refUri);
 
 }

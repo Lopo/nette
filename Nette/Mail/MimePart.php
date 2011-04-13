@@ -24,7 +24,7 @@ use Nette;
  * @property   string $body
  * @property-read array $headers
  */
-class MailMimePart extends Nette\Object
+class MimePart extends Nette\Object
 {
 	/** encoding */
 	const ENCODING_BASE64 = 'base64',
@@ -52,7 +52,7 @@ class MailMimePart extends Nette\Object
 	 * @param  string
 	 * @param  string|array  value or pair email => name
 	 * @param  bool
-	 * @return MailMimePart  provides a fluent interface
+	 * @return MimePart  provides a fluent interface
 	 */
 	public function setHeader($name, $value, $append = FALSE)
 	{
@@ -72,7 +72,7 @@ class MailMimePart extends Nette\Object
 			}
 
 			foreach ($value as $email => $name) {
-				if ($name !== NULL && !Nette\String::checkEncoding($name)) {
+				if ($name !== NULL && !Nette\StringUtils::checkEncoding($name)) {
 					throw new \InvalidArgumentException("Name is not valid UTF-8 string.");
 				}
 
@@ -88,7 +88,7 @@ class MailMimePart extends Nette\Object
 
 		} else {
 			$value = (string) $value;
-			if (!Nette\String::checkEncoding($value)) {
+			if (!Nette\StringUtils::checkEncoding($value)) {
 				throw new \InvalidArgumentException("Header is not valid UTF-8 string.");
 			}
 			$this->headers[$name] = preg_replace('#[\r\n]+#', ' ', $value);
@@ -113,7 +113,7 @@ class MailMimePart extends Nette\Object
 	/**
 	 * Removes a header.
 	 * @param  string
-	 * @return MailMimePart  provides a fluent interface
+	 * @return MimePart  provides a fluent interface
 	 */
 	public function clearHeader($name)
 	{
@@ -178,7 +178,7 @@ class MailMimePart extends Nette\Object
 	 * Sets Content-Type header.
 	 * @param  string
 	 * @param  string
-	 * @return MailMimePart  provides a fluent interface
+	 * @return MimePart  provides a fluent interface
 	 */
 	public function setContentType($contentType, $charset = NULL)
 	{
@@ -191,7 +191,7 @@ class MailMimePart extends Nette\Object
 	/**
 	 * Sets Content-Transfer-Encoding header.
 	 * @param  string
-	 * @return MailMimePart  provides a fluent interface
+	 * @return MimePart  provides a fluent interface
 	 */
 	public function setEncoding($encoding)
 	{
@@ -214,10 +214,10 @@ class MailMimePart extends Nette\Object
 
 	/**
 	 * Adds or creates new multipart.
-	 * @param  MailMimePart
-	 * @return MailMimePart
+	 * @param  MimePart
+	 * @return MimePart
 	 */
-	public function addPart(MailMimePart $part = NULL)
+	public function addPart(MimePart $part = NULL)
 	{
 		return $this->parts[] = $part === NULL ? new self : $part;
 	}
@@ -227,7 +227,7 @@ class MailMimePart extends Nette\Object
 	/**
 	 * Sets textual body.
 	 * @param  mixed
-	 * @return MailMimePart  provides a fluent interface
+	 * @return MimePart  provides a fluent interface
 	 */
 	public function setBody($body)
 	{
@@ -259,7 +259,7 @@ class MailMimePart extends Nette\Object
 	public function generateMessage()
 	{
 		$output = '';
-		$boundary = '--------' . Nette\String::random();
+		$boundary = '--------' . Nette\StringUtils::random();
 
 		foreach ($this->headers as $name => $value) {
 			$output .= $name . ': ' . $this->getEncodedHeader($name);
@@ -292,7 +292,7 @@ class MailMimePart extends Nette\Object
 				break;
 
 			default:
-				throw new \InvalidStateException('Unknown encoding.');
+				throw new Nette\InvalidStateException('Unknown encoding.');
 			}
 		}
 

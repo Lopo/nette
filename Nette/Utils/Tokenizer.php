@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Nette;
+namespace Nette\Utils;
 
 use Nette;
 
@@ -21,7 +21,7 @@ use Nette;
  * @author     David Grudl
  * @internal
  */
-class Tokenizer extends Object
+class Tokenizer extends Nette\Object
 {
 	/** @var string */
 	private $input;
@@ -59,7 +59,7 @@ class Tokenizer extends Object
 	{
 		$this->input = $input;
 		if ($this->names) {
-			$this->tokens = String::matchAll($input, $this->re);
+			$this->tokens = Nette\StringUtils::matchAll($input, $this->re);
 			$len = 0;
 			foreach ($this->tokens as & $match) {
 				$name = NULL;
@@ -78,9 +78,9 @@ class Tokenizer extends Object
 			}
 
 		} else {
-			$this->tokens = String::split($input, $this->re, PREG_SPLIT_NO_EMPTY);
-			if ($this->tokens && !String::match(end($this->tokens), $this->re)) {
-				$tmp = String::split($this->input, $this->re, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+			$this->tokens = Nette\StringUtils::split($input, $this->re, PREG_SPLIT_NO_EMPTY);
+			if ($this->tokens && !Nette\StringUtils::match(end($this->tokens), $this->re)) {
+				$tmp = Nette\StringUtils::split($this->input, $this->re, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
 				list(, $errorOffset) = end($tmp);
 			}
 		}
@@ -103,7 +103,7 @@ class Tokenizer extends Object
 	 */
 	public function getOffset($i)
 	{
-		$tokens = String::split($this->input, $this->re, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
+		$tokens = Nette\StringUtils::split($this->input, $this->re, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_OFFSET_CAPTURE);
 		$offset = isset($tokens[$i]) ? $tokens[$i][1] : strlen($this->input);
 		return array(
 			$offset,

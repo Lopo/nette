@@ -9,7 +9,7 @@
  * the file license.txt that was distributed with this source code.
  */
 
-namespace Nette\Application;
+namespace Nette\Application\Routers;
 
 use Nette;
 
@@ -20,7 +20,7 @@ use Nette;
  *
  * @author     David Grudl
  */
-class SimpleRouter extends Nette\Object implements IRouter
+class SimpleRouter extends Nette\Object implements Nette\Application\IRouter
 {
 	const PRESENTER_KEY = 'presenter';
 	const MODULE_KEY = 'module';
@@ -49,7 +49,7 @@ class SimpleRouter extends Nette\Object implements IRouter
 			}
 			$defaults = array(
 				self::PRESENTER_KEY => substr($defaults, 0, $a),
-				'action' => $a === strlen($defaults) - 1 ? Presenter::DEFAULT_ACTION : substr($defaults, $a + 1),
+				'action' => $a === strlen($defaults) - 1 ? Nette\Application\UI\Presenter::DEFAULT_ACTION : substr($defaults, $a + 1),
 			);
 		}
 
@@ -66,10 +66,10 @@ class SimpleRouter extends Nette\Object implements IRouter
 
 	/**
 	 * Maps HTTP request to a PresenterRequest object.
-	 * @param  Nette\Web\IHttpRequest
-	 * @return PresenterRequest|NULL
+	 * @param  Nette\Http\IRequest
+	 * @return Nette\Application\Request|NULL
 	 */
-	public function match(Nette\Web\IHttpRequest $httpRequest)
+	public function match(Nette\Http\IRequest $httpRequest)
 	{
 		if ($httpRequest->getUri()->getPathInfo() !== '') {
 			return NULL;
@@ -79,19 +79,19 @@ class SimpleRouter extends Nette\Object implements IRouter
 		$params += $this->defaults;
 
 		if (!isset($params[self::PRESENTER_KEY])) {
-			throw new \InvalidStateException('Missing presenter.');
+			throw new Nette\InvalidStateException('Missing presenter.');
 		}
 
 		$presenter = $this->module . $params[self::PRESENTER_KEY];
 		unset($params[self::PRESENTER_KEY]);
 
-		return new PresenterRequest(
+		return new Nette\Application\Request(
 			$presenter,
 			$httpRequest->getMethod(),
 			$params,
 			$httpRequest->getPost(),
 			$httpRequest->getFiles(),
-			array(PresenterRequest::SECURED => $httpRequest->isSecured())
+			array(Nette\Application\Request::SECURED => $httpRequest->isSecured())
 		);
 	}
 
@@ -99,11 +99,11 @@ class SimpleRouter extends Nette\Object implements IRouter
 
 	/**
 	 * Constructs absolute URL from PresenterRequest object.
-	 * @param  PresenterRequest
-	 * @param  Nette\Web\Uri
+	 * @param  Nette\Application\Request
+	 * @param  Nette\Http\Url
 	 * @return string|NULL
 	 */
-	public function constructUrl(PresenterRequest $appRequest, Nette\Web\Uri $refUri)
+	public function constructUrl(Nette\Application\Request $appRequest, Nette\Http\Url $refUri)
 	{
 		$params = $appRequest->getParams();
 

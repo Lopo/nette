@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage files dependency test.
+ * Test: Nette\Caching\Storages\FileStorage files dependency test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -23,7 +23,7 @@ $value = 'rulez';
 define('TEMP_DIR', __DIR__ . '/tmp');
 TestHelpers::purge(TEMP_DIR);
 
-$cache = new Cache(new Nette\Caching\FileStorage(TEMP_DIR));
+$cache = new Cache(new Nette\Caching\Storages\FileStorage(TEMP_DIR));
 
 
 $dependentFile = TEMP_DIR . '/spec.file';

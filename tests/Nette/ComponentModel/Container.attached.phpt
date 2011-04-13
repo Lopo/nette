@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\ComponentContainer::attached()
+ * Test: Nette\ComponentModel\Container::attached()
  *
  * @author     David Grudl
  * @package    Nette
  * @subpackage UnitTests
  */
 
-use Nette\ComponentContainer;
+use Nette\ComponentModel\Container;
 
 
 
@@ -16,7 +16,7 @@ require __DIR__ . '/../bootstrap.php';
 
 
 
-class TestClass extends ComponentContainer implements ArrayAccess
+class TestClass extends Container implements ArrayAccess
 {
 	protected function attached($obj)
 	{

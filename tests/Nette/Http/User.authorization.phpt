@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Web\User authorization.
+ * Test: Nette\Http\User authorization.
  *
  * @author     David Grudl
  * @package    Nette\Web
  * @subpackage UnitTests
  */
 
-use Nette\Web\User,
+use Nette\Http\User,
 	Nette\Security\IAuthenticator,
 	Nette\Security\AuthenticationException,
 	Nette\Security\Identity,
@@ -31,7 +31,7 @@ class AuthenticationHandler implements IAuthenticator
 	/*
 	 * @param  array
 	 * @return IIdentity
-	 * @throws AuthenticationException
+	 * @throws Nette\Security\AuthenticationException
 	 */
 	function authenticate(array $credentials)
 	{
@@ -98,7 +98,7 @@ try {
 	$user->isAllowed('delete_file');
 	Assert::fail('Expected exception');
 } catch (Exception $e) {
-	Assert::exception('InvalidStateException', "Service 'Nette\\Security\\IAuthorizator' not found.", $e );
+	Assert::exception('Nette\InvalidStateException', "Service 'Nette\\Security\\IAuthorizator' not found.", $e );
 }
 
 $handler = new AuthorizationHandler;

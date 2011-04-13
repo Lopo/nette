@@ -8,10 +8,9 @@
  * @subpackage UnitTests
  */
 
-use Nette\ComponentContainer,
+use Nette\ComponentModel\Container,
 	Nette\Forms\Form,
-	Nette\Forms\TextInput,
-	Nette\Forms\FormContainer,
+	Nette\Forms\Controls\TextInput,
 	Nette\ArrayHash;
 
 
@@ -96,7 +95,7 @@ Assert::equal( ArrayHash::from(array(
 	'secondperson' => ArrayHash::from(array(
 		'name' => 'jim',
 		'age' => '40',
-		'avatar' => new Nette\Web\HttpUploadedFile(array(
+		'avatar' => new Nette\Http\FileUpload(array(
 			'name' => 'license.txt',
 			'type' => '',
 			'size' => 3013,

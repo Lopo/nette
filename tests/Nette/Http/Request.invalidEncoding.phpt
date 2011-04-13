@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Test: Nette\Web\HttpRequest invalid encoding.
+ * Test: Nette\Http\Request invalid encoding.
  *
  * @author     David Grudl
  * @package    Nette\Web
  * @subpackage UnitTests
  */
 
-use Nette\Web\HttpRequestFactory,
-	Nette\Web\HttpUploadedFile;
+use Nette\Http\RequestFactory,
+	Nette\Http\FileUpload;
 
 
 
@@ -70,7 +70,7 @@ $_FILES = array(
 );
 
 // unfiltered data
-$factory = new HttpRequestFactory;
+$factory = new RequestFactory;
 $request = $factory->createHttpRequest();
 
 Assert::true( $request->getQuery('invalid') === INVALID );
@@ -91,13 +91,13 @@ Assert::same( '1', $request->getCookie(INVALID) );
 Assert::same( '1', $request->getCookie(CONTROL_CHARACTERS) );
 Assert::same( '1', $request->cookies['array'][INVALID] );
 
-Assert::true( $request->getFile(INVALID) instanceof HttpUploadedFile );
-Assert::true( $request->getFile(CONTROL_CHARACTERS) instanceof HttpUploadedFile );
-Assert::true( $request->files['file1'] instanceof HttpUploadedFile );
+Assert::true( $request->getFile(INVALID) instanceof FileUpload );
+Assert::true( $request->getFile(CONTROL_CHARACTERS) instanceof FileUpload );
+Assert::true( $request->files['file1'] instanceof FileUpload );
 
 
 // filtered data
-$factory = new HttpRequestFactory;
+$factory = new RequestFactory;
 $factory->setEncoding('UTF-8');
 $request = $factory->createHttpRequest();
 
@@ -121,5 +121,5 @@ Assert::false( isset($request->cookies['array'][INVALID]) );
 
 Assert::null( $request->getFile(INVALID) );
 Assert::null( $request->getFile(CONTROL_CHARACTERS) );
-Assert::true( $request->files['file1'] instanceof HttpUploadedFile );
+Assert::true( $request->files['file1'] instanceof FileUpload );
 Assert::same( "v\xc5\xbe", $request->files['file1']->name );

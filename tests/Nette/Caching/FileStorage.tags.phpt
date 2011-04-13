@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage tags dependency test.
+ * Test: Nette\Caching\Storages\FileStorage tags dependency test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -22,7 +22,7 @@ TestHelpers::purge(TEMP_DIR);
 
 
 
-$storage = new Nette\Caching\FileStorage(TEMP_DIR, new Nette\Caching\FileJournal(TEMP_DIR));
+$storage = new Nette\Caching\Storages\FileStorage(TEMP_DIR, new Nette\Caching\Storages\FileJournal(TEMP_DIR));
 $cache = new Cache($storage);
 
 

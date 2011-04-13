@@ -9,7 +9,7 @@
  */
 
 use Nette\Object,
-	Nette\Reflection\ClassReflection;
+	Nette\Reflection\ClassType;
 
 
 
@@ -33,8 +33,8 @@ function ISecond_join(ISecond $that, $separator)
 
 
 
-ClassReflection::from('IFirst')->setExtensionMethod('join', 'IFirst_join');
-ClassReflection::from('ISecond')->setExtensionMethod('join', 'ISecond_join');
+ClassType::from('IFirst')->setExtensionMethod('join', 'IFirst_join');
+ClassType::from('ISecond')->setExtensionMethod('join', 'ISecond_join');
 
 $obj = new TestClass('Hello', 'World');
 Assert::same( 'ISecond_join says Hello*World', $obj->join('*') );

@@ -8,7 +8,7 @@
  * @subpackage UnitTests
  */
 
-use Nette\Reflection\PropertyReflection;
+use Nette\Reflection\Property;
 
 
 
@@ -25,5 +25,5 @@ class B extends A
 {
 }
 
-$propInfo = new PropertyReflection('B', 'prop');
-Assert::equal( new Nette\Reflection\ClassReflection('A'), $propInfo->getDeclaringClass() );
+$propInfo = new Property('B', 'prop');
+Assert::equal( new Nette\Reflection\ClassType('A'), $propInfo->getDeclaringClass() );

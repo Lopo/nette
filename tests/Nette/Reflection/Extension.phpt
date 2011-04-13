@@ -8,7 +8,7 @@
  * @subpackage UnitTests
  */
 
-use Nette\Reflection\ExtensionReflection;
+use Nette\Reflection\Extension;
 
 
 
@@ -16,23 +16,23 @@ require __DIR__ . '/../bootstrap.php';
 
 
 
-$ext = new ExtensionReflection('standard');
+$ext = new Extension('standard');
 $funcs = $ext->getFunctions();
-Assert::equal( new Nette\Reflection\FunctionReflection('sleep'), $funcs['sleep'] );
+Assert::equal( new Nette\Reflection\GlobalFunction('sleep'), $funcs['sleep'] );
 
 
 
-$ext = new ExtensionReflection('reflection');
+$ext = new Extension('reflection');
 Assert::equal( array(
-	'ReflectionException' => new Nette\Reflection\ClassReflection('ReflectionException'),
-	'Reflection' => new Nette\Reflection\ClassReflection('Reflection'),
-	'Reflector' => new Nette\Reflection\ClassReflection('Reflector'),
-	'ReflectionFunctionAbstract' => new Nette\Reflection\ClassReflection('ReflectionFunctionAbstract'),
-	'ReflectionFunction' => new Nette\Reflection\ClassReflection('ReflectionFunction'),
-	'ReflectionParameter' => new Nette\Reflection\ClassReflection('ReflectionParameter'),
-	'ReflectionMethod' => new Nette\Reflection\ClassReflection('ReflectionMethod'),
-	'ReflectionClass' => new Nette\Reflection\ClassReflection('ReflectionClass'),
-	'ReflectionObject' => new Nette\Reflection\ClassReflection('ReflectionObject'),
-	'ReflectionProperty' => new Nette\Reflection\ClassReflection('ReflectionProperty'),
-	'ReflectionExtension' => new Nette\Reflection\ClassReflection('ReflectionExtension'),
+	'ReflectionException' => new Nette\Reflection\ClassType('ReflectionException'),
+	'Reflection' => new Nette\Reflection\ClassType('Reflection'),
+	'Reflector' => new Nette\Reflection\ClassType('Reflector'),
+	'ReflectionFunctionAbstract' => new Nette\Reflection\ClassType('ReflectionFunctionAbstract'),
+	'ReflectionFunction' => new Nette\Reflection\ClassType('ReflectionFunction'),
+	'ReflectionParameter' => new Nette\Reflection\ClassType('ReflectionParameter'),
+	'ReflectionMethod' => new Nette\Reflection\ClassType('ReflectionMethod'),
+	'ReflectionClass' => new Nette\Reflection\ClassType('ReflectionClass'),
+	'ReflectionObject' => new Nette\Reflection\ClassType('ReflectionObject'),
+	'ReflectionProperty' => new Nette\Reflection\ClassType('ReflectionProperty'),
+	'ReflectionExtension' => new Nette\Reflection\ClassType('ReflectionExtension'),
 ), $ext->getClasses() );

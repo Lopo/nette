@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Debug::barDump() with showLocation.
+ * Test: Nette\Diagnostics\Debugger::barDump() with showLocation.
  *
  * @author     David Grudl
  * @package    Nette
  * @subpackage UnitTests
  */
 
-use Nette\Debug;
+use Nette\Diagnostics\Debugger;
 
 
 
@@ -16,15 +16,15 @@ require __DIR__ . '/../bootstrap.php';
 
 
 
-Debug::$consoleMode = FALSE;
-Debug::$productionMode = FALSE;
-Debug::$showLocation = TRUE;
+Debugger::$consoleMode = FALSE;
+Debugger::$productionMode = FALSE;
+Debugger::$showLocation = TRUE;
 header('Content-Type: text/html');
 
-Debug::enable();
+Debugger::enable();
 
 function shutdown() {
-	$m = Nette\String::match(ob_get_clean(), '#debug.innerHTML = (".*");#');
+	$m = Nette\StringUtils::match(ob_get_clean(), '#debug.innerHTML = (".*");#');
 	Assert::match(<<<EOD
 %A%<h1>Dumped variables</h1>
 
@@ -46,4 +46,4 @@ Assert::handler('shutdown');
 
 
 
-Debug::barDump('value');
+Debugger::barDump('value');

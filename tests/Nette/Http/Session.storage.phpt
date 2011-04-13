@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Web\Session storage.
+ * Test: Nette\Http\Session storage.
  *
  * @author     David Grudl
  * @package    Nette\Web
  * @subpackage UnitTests
  */
 
-use Nette\Web\Session;
+use Nette\Http\Session;
 
 
 
@@ -16,7 +16,7 @@ require __DIR__ . '/../bootstrap.php';
 
 
 
-class MySessionStorage extends Nette\Object implements Nette\Web\ISessionStorage
+class MySessionStorage extends Nette\Object implements Nette\Http\ISessionStorage
 {
 	private $path;
 

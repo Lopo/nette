@@ -8,7 +8,7 @@
  * @subpackage UnitTests
  */
 
-use Nette\Reflection\FunctionReflection;
+use Nette\Reflection\GlobalFunction;
 
 
 
@@ -18,9 +18,9 @@ require __DIR__ . '/../bootstrap.php';
 
 function bar() {}
 
-$function = new FunctionReflection('bar');
+$function = new GlobalFunction('bar');
 Assert::null( $function->getExtension() );
 
 
-$function = new FunctionReflection('sort');
-Assert::equal( new Nette\Reflection\ExtensionReflection('standard'), $function->getExtension() );
+$function = new GlobalFunction('sort');
+Assert::equal( new Nette\Reflection\Extension('standard'), $function->getExtension() );

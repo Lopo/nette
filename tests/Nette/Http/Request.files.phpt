@@ -1,15 +1,15 @@
 <?php
 
 /**
- * Test: Nette\Web\HttpRequest files.
+ * Test: Nette\Http\Request files.
  *
  * @author     David Grudl
  * @package    Nette\Web
  * @subpackage UnitTests
  */
 
-use Nette\Web\HttpRequestFactory,
-	Nette\Web\HttpUploadedFile;
+use Nette\Http\RequestFactory,
+	Nette\Http\FileUpload;
 
 
 
@@ -87,13 +87,13 @@ $_FILES = array(
 	),
 );
 
-$factory = new HttpRequestFactory;
+$factory = new RequestFactory;
 $request = $factory->createHttpRequest();
 
-Assert::true( $request->files['file1'] instanceof HttpUploadedFile );
-Assert::true( $request->files['file2'][2] instanceof HttpUploadedFile );
-Assert::true( $request->files['file3']['y']['z'] instanceof HttpUploadedFile );
-Assert::true( $request->files['file3'][1] instanceof HttpUploadedFile );
+Assert::true( $request->files['file1'] instanceof FileUpload );
+Assert::true( $request->files['file2'][2] instanceof FileUpload );
+Assert::true( $request->files['file3']['y']['z'] instanceof FileUpload );
+Assert::true( $request->files['file3'][1] instanceof FileUpload );
 
 Assert::false( isset($request->files['file0']) );
 Assert::true( isset($request->files['file1']) );

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\DummyStorage test.
+ * Test: Nette\Caching\Storages\DevNullStorage test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -20,7 +20,7 @@ require __DIR__ . '/../bootstrap.php';
 $key = 'nette';
 $value = '"Hello World"';
 
-$cache = new Cache(new Nette\Caching\DummyStorage, 'myspace');
+$cache = new Cache(new Nette\Caching\Storages\DevNullStorage, 'myspace');
 
 
 Assert::false( isset($cache[$key]), 'Is cached?' );

@@ -8,7 +8,7 @@
  * @subpackage UnitTests
  */
 
-use Nette\Reflection\ClassReflection;
+use Nette\Reflection\ClassType;
 
 
 
@@ -38,7 +38,7 @@ class TestClass {
 
 // Class annotations
 
-$rc = new ClassReflection('TestClass');
+$rc = new ClassType('TestClass');
 Assert::equal( array(
 	'secured' => array(
 		new SecuredAnnotation(array(

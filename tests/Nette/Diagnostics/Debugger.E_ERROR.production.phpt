@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Debug E_ERROR in production mode.
+ * Test: Nette\Diagnostics\Debugger E_ERROR in production mode.
  *
  * @author     David Grudl
  * @package    Nette
@@ -9,7 +9,7 @@
  * @assertCode 500
  */
 
-use Nette\Debug;
+use Nette\Diagnostics\Debugger;
 
 
 
@@ -17,11 +17,11 @@ require __DIR__ . '/../bootstrap.php';
 
 
 
-Debug::$consoleMode = FALSE;
-Debug::$productionMode = TRUE;
+Debugger::$consoleMode = FALSE;
+Debugger::$productionMode = TRUE;
 header('Content-Type: text/html');
 
-Debug::enable();
+Debugger::enable();
 
 function shutdown() {
 	Assert::match('%A%<h1>Server Error</h1>%A%', ob_get_clean());

@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Web\User authentication.
+ * Test: Nette\Http\User authentication.
  *
  * @author     David Grudl
  * @package    Nette\Web
  * @subpackage UnitTests
  */
 
-use Nette\Web\User,
+use Nette\Http\User,
 	Nette\Security\IAuthenticator,
 	Nette\Security\AuthenticationException,
 	Nette\Security\Identity;
@@ -30,7 +30,7 @@ class AuthenticationHandler implements IAuthenticator
 	/*
 	 * @param  array
 	 * @return IIdentity
-	 * @throws AuthenticationException
+	 * @throws Nette\Security\AuthenticationException
 	 */
 	function authenticate(array $credentials)
 	{
@@ -79,7 +79,7 @@ try {
 	$user->login('jane', '');
 	Assert::fail('Expected exception');
 } catch (Exception $e) {
-	Assert::exception('InvalidStateException', "Service 'Nette\\Security\\IAuthenticator' not found.", $e );
+	Assert::exception('Nette\InvalidStateException', "Service 'Nette\\Security\\IAuthenticator' not found.", $e );
 }
 
 $handler = new AuthenticationHandler;
@@ -104,7 +104,7 @@ try {
 // login as john#2
 $user->login('john', 'xxx');
 Assert::true( $user->isLoggedIn(), 'isLoggedIn?' );
-Assert::equal( new Nette\Security\Identity('John Doe', 'admin'), $user->getIdentity(), 'getIdentity' );
+Assert::equal( new Identity('John Doe', 'admin'), $user->getIdentity(), 'getIdentity' );
 Assert::same( 'John Doe', $user->getId(), 'getId' );
 
 
@@ -115,7 +115,7 @@ Assert::same( 'John Doe', $user->getId(), 'getId' );
 $user->logout(FALSE);
 
 Assert::false( $user->isLoggedIn(), 'isLoggedIn?' );
-Assert::equal( new Nette\Security\Identity('John Doe', 'admin'), $user->getIdentity(), 'getIdentity' );
+Assert::equal( new Identity('John Doe', 'admin'), $user->getIdentity(), 'getIdentity' );
 
 
 // logging out and clearing identity...

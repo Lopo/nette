@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage int keys.
+ * Test: Nette\Caching\Storages\FileStorage int keys.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -26,7 +26,7 @@ TestHelpers::purge(TEMP_DIR);
 
 
 
-$cache = new Cache(new Nette\Caching\FileStorage(TEMP_DIR));
+$cache = new Cache(new Nette\Caching\Storages\FileStorage(TEMP_DIR));
 
 Assert::false( isset($cache[$key]), 'Is cached?' );
 

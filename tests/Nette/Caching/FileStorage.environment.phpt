@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage and Environment.
+ * Test: Nette\Caching\Storages\FileStorage and Environment.
  *
  * @author     David Grudl
  * @package    Nette\Caching

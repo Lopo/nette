@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Application\SimpleRouter with secured connection.
+ * Test: Nette\Application\Routers\SimpleRouter with secured connection.
  *
  * @author     David Grudl
  * @package    Nette\Application
  * @subpackage UnitTests
  */
 
-use Nette\Application\SimpleRouter;
+use Nette\Application\Routers\SimpleRouter;
 
 
 
@@ -21,16 +21,16 @@ $router = new SimpleRouter(array(
 	'any' => 'anyvalue',
 ), SimpleRouter::SECURED);
 
-$uri = new Nette\Web\UriScript('http://nette.org/file.php');
+$uri = new Nette\Http\UrlScript('http://nette.org/file.php');
 $uri->setScriptPath('/file.php');
 $uri->setQuery(array(
 	'presenter' => 'myPresenter',
 ));
-$httpRequest = new Nette\Web\HttpRequest($uri);
+$httpRequest = new Nette\Http\Request($uri);
 
-$req = new Nette\Application\PresenterRequest(
+$req = new Nette\Application\Request(
 	'othermodule:presenter',
-	Nette\Web\HttpRequest::GET,
+	Nette\Http\Request::GET,
 	array()
 );
 

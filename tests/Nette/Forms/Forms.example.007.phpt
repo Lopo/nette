@@ -9,7 +9,7 @@
  */
 
 use Nette\Forms\Form,
-	Nette\Web\HttpUploadedFile;
+	Nette\Http\FileUpload;
 
 
 
@@ -109,7 +109,7 @@ Assert::equal( array(
    'country' => 'CZ',
    'password' => 'xxx',
    'password2' => 'xxx',
-   'avatar' => new HttpUploadedFile(array(
+   'avatar' => new FileUpload(array(
       'name' => NULL,
       'type' => NULL,
       'size' => NULL,

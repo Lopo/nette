@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Test: Nette\Mail\Mail with template.
+ * Test: Nette\Mail\Message with template.
  *
  * @author     David Grudl
  * @package    Nette\Application
  * @subpackage UnitTests
  */
 
-use Nette\Mail\Mail,
+use Nette\Mail\Message,
 	Nette\Environment,
-	Nette\Templates\FileTemplate,
-	Nette\Templates\LatteFilter;
+	Nette\Templating\FileTemplate,
+	Nette\Latte\Engine;
 
 
 
@@ -27,12 +27,12 @@ TestHelpers::purge(TEMP_DIR);
 
 
 
-$mail = new Mail();
+$mail = new Message();
 $mail->addTo('Lady Jane <jane@example.com>');
 
 $mail->htmlBody = new FileTemplate;
 $mail->htmlBody->setFile('files/template.phtml');
-$mail->htmlBody->registerFilter(new LatteFilter);
+$mail->htmlBody->registerFilter(new Engine);
 
 $mail->send();
 

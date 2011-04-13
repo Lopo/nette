@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Finder filters.
+ * Test: Nette\Utils\Finder filters.
  *
  * @author     David Grudl
  * @package    Nette
@@ -9,7 +9,7 @@
  * @phpversion 5.3
  */
 
-use Nette\Finder;
+use Nette\Utils\Finder;
 
 
 

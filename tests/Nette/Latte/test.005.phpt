@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Templates\LatteFilter and macros test.
+ * Test: Nette\Latte\Engine and macros test.
  *
  * @author     David Grudl
  * @package    Nette\Templates
  * @subpackage UnitTests
  */
 
-use Nette\Templates\LatteFilter;
+use Nette\Latte\Engine;
 
 
 
@@ -57,7 +57,7 @@ class MockPresenter extends MockControl
 
 
 $template = new MockTemplate;
-$template->registerFilter(new LatteFilter);
+$template->registerFilter(new Engine);
 
 $template->control = new MockControl;
 $template->presenter = new MockPresenter;

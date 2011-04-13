@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Application\Route with ArrayParams
+ * Test: Nette\Application\Routers\Route with ArrayParams
  *
  * @author     David Grudl
  * @package    Nette\Application
  * @subpackage UnitTests
  */
 
-use Nette\Application\Route;
+use Nette\Application\Routers\Route;
 
 
 

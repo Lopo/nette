@@ -94,13 +94,13 @@ Assert::equal( ArrayHash::from(array(
 	'country' => NULL,
 	'countrym' => array(),
 	'password' => '',
-	'avatar' => new Nette\Web\HttpUploadedFile(array()),
+	'avatar' => new Nette\Http\FileUpload(array()),
 	'userid' => 'invalidutf',
 	'firstperson' => ArrayHash::from(array(
 		'age' => '',
 	)),
 	'secondperson' => ArrayHash::from(array(
 		'age' => '',
-		'avatar' => new Nette\Web\HttpUploadedFile(array()),
+		'avatar' => new Nette\Http\FileUpload(array()),
 	)),
 )), $form->getValues() );

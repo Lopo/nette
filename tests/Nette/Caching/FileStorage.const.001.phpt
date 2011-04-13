@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage constant dependency test.
+ * Test: Nette\Caching\Storages\FileStorage constant dependency test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -24,7 +24,7 @@ define('TEMP_DIR', __DIR__ . '/tmp');
 TestHelpers::purge(TEMP_DIR);
 
 
-$cache = new Cache(new Nette\Caching\FileStorage(TEMP_DIR));
+$cache = new Cache(new Nette\Caching\Storages\FileStorage(TEMP_DIR));
 
 
 define('ANY_CONST', 10);

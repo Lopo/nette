@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage & namespace test.
+ * Test: Nette\Caching\Storages\FileStorage & namespace test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -21,7 +21,7 @@ define('TEMP_DIR', __DIR__ . '/tmp');
 TestHelpers::purge(TEMP_DIR);
 
 
-$storage = new Nette\Caching\FileStorage(TEMP_DIR);
+$storage = new Nette\Caching\Storages\FileStorage(TEMP_DIR);
 $cacheA = new Cache($storage, 'a');
 $cacheB = new Cache($storage, 'b');
 

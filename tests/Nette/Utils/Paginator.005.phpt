@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Paginator ItemCount:0 test.
+ * Test: Nette\Utils\Paginator ItemCount:0 test.
  *
  * @author     Petr Procházka
  * @package    Nette
  * @subpackage UnitTests
  */
 
-use Nette\Paginator;
+use Nette\Utils\Paginator;
 
 
 

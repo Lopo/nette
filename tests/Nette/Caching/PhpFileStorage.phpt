@@ -25,7 +25,7 @@ TestHelpers::purge(TEMP_DIR);
 
 
 
-$cache = new Cache(new Nette\Templates\TemplateCacheStorage(TEMP_DIR));
+$cache = new Cache(new Nette\Templating\PhpFileStorage(TEMP_DIR));
 
 
 Assert::false( isset($cache[$key]), 'Is cached?' );

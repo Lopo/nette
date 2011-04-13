@@ -9,7 +9,7 @@
  */
 
 use Nette\Caching\Cache,
-	Nette\Caching\MemcachedStorage;
+	Nette\Caching\Storages\MemcachedStorage;
 
 
 

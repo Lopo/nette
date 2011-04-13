@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Application\Route with WithUserClassAlt
+ * Test: Nette\Application\Routers\Route with WithUserClassAlt
  *
  * @author     David Grudl
  * @package    Nette\Application
  * @subpackage UnitTests
  */
 
-use Nette\Application\Route;
+use Nette\Application\Routers\Route;
 
 
 

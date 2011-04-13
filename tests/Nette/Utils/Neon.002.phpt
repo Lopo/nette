@@ -8,7 +8,7 @@
  * @subpackage UnitTests
  */
 
-use Nette\Neon;
+use Nette\Utils\Neon;
 
 
 

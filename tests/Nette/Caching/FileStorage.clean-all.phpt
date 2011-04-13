@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage clean with Cache::ALL
+ * Test: Nette\Caching\Storages\FileStorage clean with Cache::ALL
  *
  * @author     Petr Procházka
  * @package    Nette\Caching
@@ -20,7 +20,7 @@ require __DIR__ . '/../bootstrap.php';
 define('TEMP_DIR', __DIR__ . '/tmp');
 TestHelpers::purge(TEMP_DIR);
 
-$storage = new Nette\Caching\FileStorage(TEMP_DIR);
+$storage = new Nette\Caching\Storages\FileStorage(TEMP_DIR);
 $cacheA = new Cache($storage);
 $cacheB = new Cache($storage,'B');
 

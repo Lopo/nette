@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileStorage priority test.
+ * Test: Nette\Caching\Storages\FileStorage priority test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -21,7 +21,7 @@ define('TEMP_DIR', __DIR__ . '/tmp');
 TestHelpers::purge(TEMP_DIR);
 
 
-$storage = new Nette\Caching\FileStorage(TEMP_DIR, new Nette\Caching\FileJournal(TEMP_DIR));
+$storage = new Nette\Caching\Storages\FileStorage(TEMP_DIR, new Nette\Caching\Storages\FileJournal(TEMP_DIR));
 $cache = new Cache($storage);
 
 

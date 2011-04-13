@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\SafeStream basic usage.
+ * Test: Nette\Utils\SafeStream basic usage.
  *
  * @author     David Grudl
  * @package    Nette
  * @subpackage UnitTests
  */
 
-use Nette\SafeStream;
+use Nette\Utils\SafeStream;
 
 
 

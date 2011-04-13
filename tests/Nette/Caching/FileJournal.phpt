@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\FileJournal basic test.
+ * Test: Nette\Caching\Storages\FileJournal basic test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -9,7 +9,7 @@
  */
 
 use Nette\Caching\Cache,
-	Nette\Caching\FileJournal;
+	Nette\Caching\Storages\FileJournal;
 
 
 

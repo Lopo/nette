@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Application\Route and auto-optional as optional sequences.
+ * Test: Nette\Application\Routers\Route and auto-optional as optional sequences.
  *
  * @author     David Grudl
  * @package    Nette\Application
  * @subpackage UnitTests
  */
 
-use Nette\Application\Route;
+use Nette\Application\Routers\Route;
 
 
 

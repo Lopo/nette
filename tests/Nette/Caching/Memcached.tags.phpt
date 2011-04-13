@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Caching\MemcachedStorage tags dependency test.
+ * Test: Nette\Caching\Storages\MemcachedStorage tags dependency test.
  *
  * @author     David Grudl
  * @package    Nette\Caching
@@ -15,7 +15,7 @@ use Nette\Caching\Cache;
 require __DIR__ . '/../bootstrap.php';
 
 
-if (!Nette\Caching\MemcachedStorage::isAvailable()) {
+if (!Nette\Caching\Storages\MemcachedStorage::isAvailable()) {
 	TestHelpers::skip('Requires PHP extension Memcache.');
 }
 
@@ -26,7 +26,7 @@ TestHelpers::purge(TEMP_DIR);
 
 
 
-$storage = new Nette\Caching\MemcachedStorage('localhost', 11211, '', new Nette\Caching\FileJournal(TEMP_DIR));
+$storage = new Nette\Caching\Storages\MemcachedStorage('localhost', 11211, '', new Nette\Caching\Storages\FileJournal(TEMP_DIR));
 $cache = new Cache($storage);
 
 

@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Test: Nette\Templates\LatteFilter and macros test.
+ * Test: Nette\Latte\Engine and macros test.
  *
  * @author     David Grudl
  * @package    Nette\Templates
  * @subpackage UnitTests
  */
 
-use Nette\Templates\LatteFilter;
+use Nette\Latte\Engine;
 
 
 
@@ -29,9 +29,9 @@ class MockTexy
 
 
 $template = new MockTemplate;
-$template->registerFilter(new LatteFilter);
+$template->registerFilter(new Engine);
 $template->registerHelper('texy', array(new MockTexy, 'process'));
-$template->registerHelperLoader('Nette\Templates\TemplateHelpers::loader');
+$template->registerHelperLoader('Nette\Templating\DefaultHelpers::loader');
 
 $template->hello = '<i>Hello</i>';
 $template->people = array('John', 'Mary', 'Paul');

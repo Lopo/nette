@@ -58,7 +58,7 @@ try {
 
 	Assert::fail('Expected exception');
 } catch (Exception $e) {
-	Assert::exception('MemberAccessException', 'Call to undefined method TestClass::onPrivate().', $e );
+	Assert::exception('Nette\MemberAccessException', 'Call to undefined method TestClass::onPrivate().', $e );
 }
 
 
@@ -68,5 +68,5 @@ try {
 
 	Assert::fail('Expected exception');
 } catch (Exception $e) {
-	Assert::exception('MemberAccessException', 'Call to undefined method TestClass::onUndefined().', $e );
+	Assert::exception('Nette\MemberAccessException', 'Call to undefined method TestClass::onUndefined().', $e );
 }

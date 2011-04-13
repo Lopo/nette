@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Test: Nette\Templates\LatteFilter and macros test.
+ * Test: Nette\Latte\Engine and macros test.
  *
  * @author     David Grudl
  * @package    Nette\Templates
@@ -9,8 +9,8 @@
  * @keepTrailingSpaces
  */
 
-use Nette\Templates\FileTemplate,
-	Nette\Templates\LatteFilter;
+use Nette\Templating\FileTemplate,
+	Nette\Latte\Engine;
 
 
 
@@ -29,7 +29,7 @@ TestHelpers::purge(TEMP_DIR);
 $template = new FileTemplate;
 $template->setCacheStorage(new MockCacheStorage(TEMP_DIR));
 $template->setFile(__DIR__ . '/templates/inheritance.child1.latte');
-$template->registerFilter(new LatteFilter);
+$template->registerFilter(new Engine);
 
 $template->people = array('John', 'Mary', 'Paul');
 

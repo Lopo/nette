@@ -270,11 +270,12 @@ class FileStorage extends Nette\Object implements Nette\Caching\IStorage
 	{
 		$all = !empty($conds[Cache::ALL]);
 		$collector = empty($conds);
+		$from = (!$collector && !empty($conds[Cache::NAMESPACE_ONLY])) ? $this->getCacheFile($conds[Cache::NAMESPACE_ONLY]) : $this->dir;
 
 		// cleaning using file iterator
 		if ($all || $collector) {
 			$now = time();
-			foreach (Nette\Utils\Finder::find('*')->from($this->dir)->childFirst() as $entry) {
+			foreach (Nette\Utils\Finder::find('*')->from($from)->childFirst() as $entry) {
 				$path = (string) $entry;
 				if ($entry->isDir()) { // collector: remove empty dirs
 					@rmdir($path); // @ - removing dirs is not necessary

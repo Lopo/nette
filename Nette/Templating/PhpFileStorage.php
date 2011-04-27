@@ -48,6 +48,9 @@ class PhpFileStorage extends Nette\Caching\Storages\FileStorage
 	 */
 	protected function getCacheFile($key)
 	{
+		if (($pos=strpos($key, Nette\Caching\Cache::NAMESPACE_SEPARATOR)) === FALSE) { //whole namespace
+			return parent::getCacheFile($key);
+		}
 		return parent::getCacheFile(substr_replace(
 			$key,
 			trim(strtr($this->hint, '\\/@', '.._'), '.') . '-',

@@ -32,7 +32,8 @@ class Cache extends Nette\Object implements \ArrayAccess
 		ITEMS = 'items',
 		CONSTS = 'consts',
 		CALLBACKS = 'callbacks',
-		ALL = 'all';
+		ALL = 'all',
+		NAMESPACE_ONLY = 'namespace';
 
 	/** @internal */
 	const NAMESPACE_SEPARATOR = "\x00";
@@ -192,6 +193,12 @@ class Cache extends Nette\Object implements \ArrayAccess
 	public function clean(array $conds = NULL)
 	{
 		$this->release();
+		if ($conds !== NULL && !empty($conds[Cache::NAMESPACE_ONLY]) && $conds[Cache::NAMESPACE_ONLY] === TRUE) {
+			$conds[Cache::NAMESPACE_ONLY]=$this->getNamespace();
+		}
+		else {
+			unset($conds[Cache::NAMESPACE_ONLY]);
+		}
 		$this->storage->clean((array) $conds);
 	}
 

@@ -142,7 +142,9 @@ class RobotLoader extends AutoLoader
 	public function _rebuildCallback()
 	{
 		foreach ($this->list as $pair) {
-			if ($pair) $this->files[$pair[0]] = $pair[1];
+			if ($pair) {
+				$this->files[$pair[0]] = $pair[1];
+			}
 		}
 		foreach (array_unique($this->scanDirs) as $dir) {
 			$this->scanDirectory($dir);
@@ -160,7 +162,9 @@ class RobotLoader extends AutoLoader
 	{
 		$res = array();
 		foreach ($this->list as $class => $pair) {
-			if ($pair) $res[$pair[2]] = $pair[0];
+			if ($pair) {
+				$res[$pair[2]] = $pair[0];
+			}
 		}
 		return $res;
 	}
@@ -170,7 +174,7 @@ class RobotLoader extends AutoLoader
 	/**
 	 * Add directory (or directories) to list.
 	 * @param  string|array
-	 * @return void
+	 * @return RobotLoader  provides a fluent interface
 	 * @throws Nette\DirectoryNotFoundException if path is not found
 	 */
 	public function addDirectory($path)
@@ -182,6 +186,7 @@ class RobotLoader extends AutoLoader
 			}
 			$this->scanDirs[] = $real;
 		}
+		return $this;
 	}
 
 
@@ -273,7 +278,9 @@ class RobotLoader extends AutoLoader
 		$s = file_get_contents($file);
 
 		foreach ($this->list as $class => $pair) {
-			if ($pair && $pair[0] === $file) unset($this->list[$class]);
+			if ($pair && $pair[0] === $file) {
+				unset($this->list[$class]);
+			}
 		}
 
 		if ($matches = Strings::match($s, '#//nette'.'loader=(\S*)#')) {

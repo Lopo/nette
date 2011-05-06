@@ -54,3 +54,11 @@ $cache[$key] = NULL;
 $cache->release();
 
 Assert::false( isset($cache[$key]), 'Is cached?' );
+
+
+
+// Writing cache...
+$cache->save($key, $value);
+$cache->release();
+
+Assert::true( $cache->load($key) === $value, 'Is cache ok?' );

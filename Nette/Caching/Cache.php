@@ -89,7 +89,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function derive($namespace)
 	{
-		$derived = new self($this->storage, $this->namespace . $namespace);
+		$derived = new static($this->storage, $this->namespace . $namespace);
 		return $derived;
 	}
 
@@ -102,6 +102,24 @@ class Cache extends Nette\Object implements \ArrayAccess
 	public function release()
 	{
 		$this->key = $this->data = NULL;
+	}
+
+
+
+	/**
+	 * Retrieves the specified item from the cache or returns NULL if the key is not found.
+	 * @param  mixed key
+	 * @return mixed|NULL
+	 */
+	public function load($key)
+	{
+		$key = is_scalar($key) ? (string) $key : serialize($key);
+		if ($this->key === $key) {
+			return $this->data;
+		}
+		$this->key = $key;
+		$this->data = $this->storage->read($this->namespace . md5($key));
+		return $this->data;
 	}
 
 
@@ -212,7 +230,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	public function call($function)
 	{
 		$key = func_get_args();
-		if ($this->offsetGet($key) === NULL) {
+		if ($this->load($key) === NULL) {
 			array_shift($key);
 			return $this->save($this->key, call_user_func_array($function, $key));
 		} else {
@@ -264,13 +282,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function offsetGet($key)
 	{
-		$key = is_scalar($key) ? (string) $key : serialize($key);
-		if ($this->key === $key) {
-			return $this->data;
-		}
-		$this->key = $key;
-		$this->data = $this->storage->read($this->namespace . md5($key));
-		return $this->data;
+		return $this->load($key);
 	}
 
 
@@ -283,7 +295,7 @@ class Cache extends Nette\Object implements \ArrayAccess
 	 */
 	public function offsetExists($key)
 	{
-		return $this->offsetGet($key) !== NULL;
+		return $this->load($key) !== NULL;
 	}
 
 

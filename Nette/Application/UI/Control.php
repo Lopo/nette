@@ -44,8 +44,8 @@ abstract class Control extends PresenterComponent implements IPartiallyRenderabl
 		if ($this->template === NULL) {
 			$value = $this->createTemplate();
 			if (!$value instanceof Nette\Templating\ITemplate && $value !== NULL) {
-				$class = get_class($value);
-				throw new Nette\UnexpectedValueException("Object returned by {$this->reflection->name}::createTemplate() must be instance of Nette\\Templating\\ITemplate, '$class' given.");
+				$class2 = get_class($value); $class = get_class($this);
+				throw new Nette\UnexpectedValueException("Object returned by $class::createTemplate() must be instance of Nette\\Templating\\ITemplate, '$class2' given.");
 			}
 			$this->template = $value;
 		}
@@ -66,14 +66,19 @@ abstract class Control extends PresenterComponent implements IPartiallyRenderabl
 		// default parameters
 		$template->control = $this;
 		$template->presenter = $presenter;
-		$template->user = Nette\Environment::getUser();
-		$template->baseUri = $template->baseUrl = rtrim(Nette\Environment::getVariable('baseUri', NULL), '/');
-		$template->basePath = preg_replace('#https?://[^/]+#A', '', $template->baseUrl);
+		if ($presenter instanceof Presenter) {
+			$template->setCacheStorage($presenter->getContext()->getService('templateCacheStorage'));
+			$template->user = $presenter->getUser();
+			$template->netteHttpResponse = $presenter->getHttpResponse();
+			$template->netteCacheStorage = $presenter->getContext()->getService('Nette\\Caching\\ICacheStorage');
+			$template->baseUri = $template->baseUrl = rtrim($presenter->getHttpRequest()->getUrl()->getBaseUrl(), '/');
+			$template->basePath = preg_replace('#https?://[^/]+#A', '', $template->baseUrl);
 
-		// flash message
-		if ($presenter !== NULL && $presenter->hasFlashSession()) {
-			$id = $this->getParamId('flash');
-			$template->flashes = $presenter->getFlashSession()->$id;
+			// flash message
+			if ($presenter->hasFlashSession()) {
+				$id = $this->getParamId('flash');
+				$template->flashes = $presenter->getFlashSession()->$id;
+			}
 		}
 		if (!isset($template->flashes) || !is_array($template->flashes)) {
 			$template->flashes = array();

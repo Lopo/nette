@@ -55,7 +55,7 @@ class Application extends Nette\Object
 	/** @var IPresenter */
 	private $presenter;
 
-	/** @var Nette\DI\IContext */
+	/** @var Nette\DI\IContainer */
 	private $context;
 
 
@@ -102,7 +102,7 @@ class Application extends Nette\Object
 					$router = $this->getRouter();
 
 					// enable routing debuggger
-					Nette\Diagnostics\Debugger::$bar->addPanel(new Diagnostics\RoutingPanel($router, $httpRequest));
+					Diagnostics\RoutingPanel::initialize($this, $httpRequest);
 
 					$request = $router->match($httpRequest);
 					if (!$request instanceof Request) {
@@ -226,7 +226,7 @@ class Application extends Nette\Object
 	 * Sets the context.
 	 * @return Application  provides a fluent interface
 	 */
-	public function setContext(Nette\DI\IContext $context)
+	public function setContext(Nette\DI\IContainer $context)
 	{
 		$this->context = $context;
 		return $this;
@@ -236,7 +236,7 @@ class Application extends Nette\Object
 
 	/**
 	 * Gets the context.
-	 * @return Nette\DI\IContext
+	 * @return Nette\DI\IContainer
 	 */
 	final public function getContext()
 	{
@@ -248,12 +248,11 @@ class Application extends Nette\Object
 	/**
 	 * Gets the service object of the specified type.
 	 * @param  string service name
-	 * @param  array  options in case service is not singleton
 	 * @return object
 	 */
-	final public function getService($name, array $options = NULL)
+	final public function getService($name)
 	{
-		return $this->context->getService($name, $options);
+		return $this->context->getService($name);
 	}
 
 

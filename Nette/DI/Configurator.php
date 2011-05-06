@@ -12,8 +12,8 @@
 namespace Nette\DI;
 
 use Nette,
-	Nette\Environment,
-	Nette\Config\Config;
+	Nette\ArrayHash,
+	Nette\Environment;
 
 
 
@@ -30,15 +30,16 @@ class Configurator extends Nette\Object
 	/** @var array */
 	public $defaultServices = array(
 		'Nette\\Application\\Application' => array(__CLASS__, 'createApplication'),
-		'Nette\\Web\\HttpContext' => 'Nette\Http\Context',
+		'Nette\\Web\\HttpContext' => array(__CLASS__, 'createHttpContext'),
 		'Nette\\Web\\IHttpRequest' => array(__CLASS__, 'createHttpRequest'),
 		'Nette\\Web\\IHttpResponse' => 'Nette\Http\Response',
-		'Nette\\Web\\IUser' => 'Nette\Http\User',
+		'Nette\\Web\\IUser' => array(__CLASS__, 'createHttpUser'),
 		'Nette\\Caching\\ICacheStorage' => array(__CLASS__, 'createCacheStorage'),
 		'Nette\\Caching\\ICacheJournal' => array(__CLASS__, 'createCacheJournal'),
 		'Nette\\Mail\\IMailer' => array(__CLASS__, 'createMailer'),
-		'Nette\\Web\\Session' => 'Nette\Http\Session',
+		'Nette\\Web\\Session' => array(__CLASS__, 'createHttpSession'),
 		'Nette\\Loaders\\RobotLoader' => array(__CLASS__, 'createRobotLoader'),
+		'templateCacheStorage' => array(__CLASS__, 'createTemplateCacheStorage'),
 	);
 
 
@@ -106,14 +107,14 @@ class Configurator extends Nette\Object
 
 	/**
 	 * Loads global configuration from file and process it.
-	 * @param  string|Nette\Config\Config  file name or Config object
-	 * @return Nette\Config\Config
+	 * @param  string  file name
+	 * @return Nette\ArrayHash
 	 */
 	public function loadConfig($file)
 	{
 		$name = Environment::getName();
 
-		if ($file instanceof Config) {
+		if ($file instanceof ArrayHash) {
 			$config = $file;
 			$file = NULL;
 
@@ -125,11 +126,11 @@ class Configurator extends Nette\Object
 			if (!is_file($file)) {
 				$file = preg_replace('#\.neon$#', '.ini', $file); // backcompatibility
 			}
-			$config = Config::fromFile($file, $name);
+			$config = Nette\Config\Config::fromFile($file, $name);
 		}
 
 		// process environment variables
-		if ($config->variable instanceof Config) {
+		if (isset($config->variable) && $config->variable instanceof \Traversable) {
 			foreach ($config->variable as $key => $value) {
 				Environment::setVariable($key, $value);
 			}
@@ -144,26 +145,27 @@ class Configurator extends Nette\Object
 
 		// process services
 		$runServices = array();
-		$context = Environment::getContext();
-		if ($config->service instanceof Config) {
+		$container = Environment::getContext();
+		if (isset($config->service) && $config->service instanceof \Traversable) {
 			foreach ($config->service as $key => $value) {
 				$key = strtr($key, '-', '\\'); // limited INI chars
 				if (is_string($value)) {
-					$context->removeService($key);
-					$context->addService($key, $value);
+					$container->removeService($key);
+					$container->addService($key, $value);
 				} else {
-					if ($value->factory || isset($this->defaultServices[$key])) {
-						$context->removeService($key);
-						$context->addService(
-							$key,
-							$value->factory ? $value->factory : $this->defaultServices[$key],
-							isset($value->singleton) ? $value->singleton : TRUE,
-							(array) $value->option
-						);
+					if (!empty($value->factory) || isset($this->defaultServices[$key])) {
+						$factory = empty($value->factory) ? $this->defaultServices[$key] : $value->factory;
+						if (!empty($value->option)) {
+							$factory = function() use ($container, $factory, $value) {
+								return call_user_func($factory, $container, (array) $value->option);
+							};
+						}
+						$container->removeService($key);
+						$container->addService($key, $factory);
 					} else {
 						throw new Nette\InvalidStateException("Factory method is not specified for service $key.");
 					}
-					if ($value->run) {
+					if (!empty($value->run)) {
 						$runServices[] = $key;
 					}
 				}
@@ -171,18 +173,18 @@ class Configurator extends Nette\Object
 		}
 
 		// process ini settings
-		if (!$config->php) { // backcompatibility
+		if (!isset($config->php) && isset($config->set)) { // backcompatibility
 			$config->php = $config->set;
 			unset($config->set);
 		}
 
-		if ($config->php instanceof Config) {
+		if (isset($config->php) && $config->php instanceof \Traversable) {
 			if (PATH_SEPARATOR !== ';' && isset($config->php->include_path)) {
 				$config->php->include_path = str_replace(';', PATH_SEPARATOR, $config->php->include_path);
 			}
 
 			foreach (clone $config->php as $key => $value) { // flatten INI dots
-				if ($value instanceof Config) {
+				if ($value instanceof \Traversable) {
 					unset($config->php->$key);
 					foreach ($value as $k => $v) {
 						$config->php->{"$key.$k"} = $v;
@@ -236,14 +238,14 @@ class Configurator extends Nette\Object
 		}
 
 		// define constants
-		if ($config->const instanceof Config) {
+		if (isset($config->const) && $config->const instanceof \Traversable) {
 			foreach ($config->const as $key => $value) {
 				define($key, $value);
 			}
 		}
 
 		// set modes
-		if (isset($config->mode)) {
+		if (isset($config->mode) && isset($config->mode)) {
 			foreach ($config->mode as $mode => $state) {
 				Environment::setMode($mode, $state);
 			}
@@ -251,7 +253,7 @@ class Configurator extends Nette\Object
 
 		// auto-start services
 		foreach ($runServices as $name) {
-			$context->getService($name);
+			$container->getService($name);
 		}
 
 		return $config;
@@ -265,15 +267,15 @@ class Configurator extends Nette\Object
 
 	/**
 	 * Get initial instance of context.
-	 * @return IContext
+	 * @return IContainer
 	 */
-	public function createContext()
+	public function createContainer()
 	{
-		$context = new Context;
+		$container = new Container;
 		foreach ($this->defaultServices as $name => $service) {
-			$context->addService($name, $service);
+			$container->addService($name, $service);
 		}
-		return $context;
+		return $container;
 	}
 
 
@@ -281,24 +283,24 @@ class Configurator extends Nette\Object
 	/**
 	 * @return Nette\Application\Application
 	 */
-	public static function createApplication(array $options = NULL)
+	public static function createApplication(IContainer $container, array $options = NULL)
 	{
-		if (Environment::getVariable('baseUri', NULL) === NULL) {
-			Environment::setVariable('baseUri', Environment::getHttpRequest()->getUrl()->getBaseUrl());
-		}
+		$container = clone $container;
+		$container->addService('Nette\\Application\\IRouter', 'Nette\Application\Routers\RouteList');
 
-		$context = clone Environment::getContext();
-		$context->addService('Nette\\Application\\IRouter', 'Nette\Application\Routers\RouteList');
-
-		if (!$context->hasService('Nette\\Application\\IPresenterFactory')) {
-			$context->addService('Nette\\Application\\IPresenterFactory', function() use ($context) {
-				return new Nette\Application\PresenterFactory(Environment::getVariable('appDir'), $context);
+		if (!$container->hasService('Nette\\Application\\IPresenterFactory')) {
+			$container->addService('Nette\\Application\\IPresenterFactory', function() use ($container) {
+				return new Nette\Application\PresenterFactory(Environment::getVariable('appDir'), $container);
 			});
 		}
 
+		Nette\Application\UI\Presenter::$invalidLinkMode = Environment::isProduction()
+			? Nette\Application\UI\Presenter::INVALID_LINK_SILENT
+			: Nette\Application\UI\Presenter::INVALID_LINK_WARNING;
+
 		$class = isset($options['class']) ? $options['class'] : 'Nette\Application\Application';
 		$application = new $class;
-		$application->setContext($context);
+		$application->setContext($container);
 		$application->catchExceptions = Environment::isProduction();
 		return $application;
 	}
@@ -318,14 +320,63 @@ class Configurator extends Nette\Object
 
 
 	/**
+	 * @return Nette\Http\Context
+	 */
+	public static function createHttpContext(IContainer $container)
+	{
+		return new Nette\Http\Context(
+			$container->getService('Nette\\Web\\IHttpRequest'),
+			$container->getService('Nette\\Web\\IHttpResponse')
+		);
+	}
+
+
+
+	/**
+	 * @return Nette\Http\Session
+	 */
+	public static function createHttpSession(IContainer $container)
+	{
+		return new Nette\Http\Session(
+			$container->getService('Nette\\Web\\IHttpRequest'),
+			$container->getService('Nette\\Web\\IHttpResponse')
+		);
+	}
+
+
+
+	/**
+	 * @return Nette\Http\User
+	 */
+	public static function createHttpUser(IContainer $container)
+	{
+		return new Nette\Http\User(clone $container);
+	}
+
+
+
+	/**
 	 * @return Nette\Caching\IStorage
 	 */
-	public static function createCacheStorage()
+	public static function createCacheStorage(IContainer $container)
 	{
 		$dir = Environment::getVariable('tempDir') . '/cache';
 		umask(0000);
 		@mkdir($dir, 0777); // @ - directory may exists
-		return new Nette\Caching\Storages\FileStorage($dir, Environment::getService('Nette\\Caching\\ICacheJournal'));
+		return new Nette\Caching\Storages\FileStorage($dir, $container->getService('Nette\\Caching\\ICacheJournal'));
+	}
+
+
+
+	/**
+	 * @return Nette\Caching\IStorage
+	 */
+	public static function createTemplateCacheStorage()
+	{
+		$dir = Environment::getVariable('tempDir') . '/cache';
+		umask(0000);
+		@mkdir($dir, 0777); // @ - directory may exists
+		return new Nette\Templating\PhpFileStorage($dir);
 	}
 
 
@@ -343,7 +394,7 @@ class Configurator extends Nette\Object
 	/**
 	 * @return Nette\Mail\IMailer
 	 */
-	public static function createMailer(array $options = NULL)
+	public static function createMailer(IContainer $container, array $options = NULL)
 	{
 		if (empty($options['smtp'])) {
 			return new Nette\Mail\SendmailMailer;
@@ -357,11 +408,11 @@ class Configurator extends Nette\Object
 	/**
 	 * @return Nette\Loaders\RobotLoader
 	 */
-	public static function createRobotLoader(array $options = NULL)
+	public static function createRobotLoader(IContainer $container, array $options = NULL)
 	{
 		$loader = new Nette\Loaders\RobotLoader;
 		$loader->autoRebuild = isset($options['autoRebuild']) ? $options['autoRebuild'] : !Environment::isProduction();
-		$loader->setCacheStorage(Environment::getService('Nette\\Caching\\ICacheStorage'));
+		$loader->setCacheStorage($container->getService('Nette\\Caching\\ICacheStorage'));
 		if (isset($options['directory'])) {
 			$loader->addDirectory($options['directory']);
 		} else {

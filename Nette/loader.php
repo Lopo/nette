@@ -34,7 +34,7 @@ extension_loaded('mbstring') && mb_internal_encoding('UTF-8');
 
 
 /**
- * Load and configure Nette Framework
+ * Load and configure Nette Framework.
  */
 define('NETTE', TRUE);
 define('NETTE_DIR', __DIR__);
@@ -48,7 +48,6 @@ require_once __DIR__ . '/common/Object.php';
 require_once __DIR__ . '/Utils/LimitedScope.php';
 require_once __DIR__ . '/Loaders/AutoLoader.php';
 require_once __DIR__ . '/Loaders/NetteLoader.php';
-require_once __DIR__ . '/Diagnostics/Helpers.php';
 
 
 Nette\Loaders\NetteLoader::getInstance()->register();

@@ -93,7 +93,9 @@ class ClassType extends \ReflectionClass
 					self::$extMethods[$pair[1]][''] = NULL;
 				}
 			}
-			if ($name === NULL) return NULL;
+			if ($name === NULL) {
+				return NULL;
+			}
 		}
 		*/
 
@@ -247,6 +249,17 @@ class ClassType extends \ReflectionClass
 	public function getAnnotations()
 	{
 		return AnnotationsParser::getAll($this);
+	}
+
+
+
+	/**
+	 * Returns value of annotation 'description'.
+	 * @return string
+	 */
+	public function getDescription()
+	{
+		return $this->getAnnotation('description');
 	}
 
 

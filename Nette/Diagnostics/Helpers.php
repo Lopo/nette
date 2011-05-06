@@ -26,11 +26,24 @@ final class Helpers
 
 	/**
 	 * Returns link to editor.
-	 * @return string
+	 * @return Nette\Utils\Html
 	 */
 	public static function editorLink($file, $line)
 	{
-		return strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line));
+		$dir = dirname(strtr($file, '/', DIRECTORY_SEPARATOR));
+		$base = isset($_SERVER['SCRIPT_FILENAME']) ? dirname(dirname(strtr($_SERVER['SCRIPT_FILENAME'], '/', DIRECTORY_SEPARATOR))) : dirname($dir);
+		if (substr($dir, 0, strlen($base)) === $base) {
+			$dir = '...' . substr($dir, strlen($base));
+		}
+
+		if (Debugger::$editor) {
+			$el = Nette\Utils\Html::el('a')
+				->href(strtr(Debugger::$editor, array('%file' => rawurlencode($file), '%line' => $line)));
+		} else {
+			$el = Nette\Utils\Html::el('span');
+		}
+		return $el->title("$file:$line")
+			->setHtml(htmlSpecialChars(rtrim($dir, DIRECTORY_SEPARATOR)) . DIRECTORY_SEPARATOR . '<b>' . htmlSpecialChars(basename($file)) . '</b>');
 	}
 
 
@@ -72,7 +85,9 @@ final class Helpers
 
 		} elseif (is_float($var)) {
 			$var = var_export($var, TRUE);
-			if (strpos($var, '.') === FALSE) $var .= '.0';
+			if (strpos($var, '.') === FALSE) {
+				$var .= '.0';
+			}
 			return "$var\n";
 
 		} elseif (is_string($var)) {
@@ -91,7 +106,9 @@ final class Helpers
 			$brackets = range(0, count($var) - 1) === array_keys($var) ? "[]" : "{}";
 
 			static $marker;
-			if ($marker === NULL) $marker = uniqid("\x00", TRUE);
+			if ($marker === NULL) {
+				$marker = uniqid("\x00", TRUE);
+			}
 			if (empty($var)) {
 
 			} elseif (isset($var[$marker])) {
@@ -102,7 +119,9 @@ final class Helpers
 				$s .= "<code>$brackets[0]\n";
 				$var[$marker] = $brackets;
 				foreach ($var as $k => &$v) {
-					if ($k === $marker) continue;
+					if ($k === $marker) {
+						continue;
+					}
 					$k = is_int($k) ? $k : '"' . htmlSpecialChars(strtr($k, preg_match($reBinary, $k) || preg_last_error() ? $tableBin : $tableUtf)) . '"';
 					$s .= "$space$space1$k => " . self::htmlDump($v, $level + 1);
 				}

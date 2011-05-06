@@ -36,7 +36,7 @@ final class Environment
 	/** @var \ArrayObject */
 	private static $config;
 
-	/** @var Nette\DI\IContext */
+	/** @var Nette\DI\IContainer */
 	private static $context;
 
 	/** @var array */
@@ -263,11 +263,13 @@ final class Environment
 	{
 		static $livelock;
 		if (is_string($var) && strpos($var, '%') !== FALSE) {
-			return @preg_replace_callback(
+			return @preg_replace_callback( // intentionally @
 				'#%([a-z0-9_-]*)%#i',
 				function ($m) use (& $livelock) {
 					list(, $var) = $m;
-					if ($var === '') return '%';
+					if ($var === '') {
+						return '%';
+					}
 
 					if (isset($livelock[$var])) {
 						throw new InvalidStateException("Circular reference detected for variables: "
@@ -303,12 +305,12 @@ final class Environment
 
 	/**
 	 * Get initial instance of context.
-	 * @return Nette\DI\IContext
+	 * @return Nette\DI\IContainer
 	 */
 	public static function getContext()
 	{
 		if (self::$context === NULL) {
-			self::$context = self::getConfigurator()->createContext();
+			self::$context = self::getConfigurator()->createContainer();
 		}
 		return self::$context;
 	}
@@ -318,12 +320,11 @@ final class Environment
 	/**
 	 * Gets the service object of the specified type.
 	 * @param  string service name
-	 * @param  array  options in case service is not singleton
 	 * @return object
 	 */
-	public static function getService($name, array $options = NULL)
+	public static function getService($name)
 	{
-		return self::getContext()->getService($name, $options);
+		return self::getContext()->getService($name);
 	}
 
 
@@ -455,7 +456,7 @@ final class Environment
 
 	/**
 	 * Loads global configuration from file and process it.
-	 * @param  string|Nette\Config\Config  file name or Config object
+	 * @param  string  file name
 	 * @return \ArrayObject
 	 */
 	public static function loadConfig($file = NULL)

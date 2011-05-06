@@ -20,29 +20,26 @@ use Nette;
  *
  * @author     David Grudl
  */
-interface IContext
+interface IContainer
 {
 
 	/**
-	 * Adds the specified service to the service container.
-	 * @param  string service name
-	 * @param  mixed  object, class name or factory callback
-	 * @param  bool   is singleton?
-	 * @param  array  factory options
+	 * Adds the specified service or service factory to the container.
+	 * @param  string
+	 * @param  mixed  object, class name or callback
 	 * @return void
 	 */
-	function addService($name, $service, $singleton = TRUE, array $options = NULL);
+	function addService($name, $service);
 
 	/**
 	 * Gets the service object of the specified type.
 	 * @param  string service name
-	 * @param  array  options in case service is not singleton
 	 * @return mixed
 	 */
-	function getService($name, array $options = NULL);
+	function getService($name);
 
 	/**
-	 * Removes the specified service type from the service container.
+	 * Removes the specified service type from the container.
 	 * @return void
 	 */
 	function removeService($name);

@@ -18,7 +18,7 @@ use Nette,
 
 
 /**
- * Debug panel for Nette\Database
+ * Debug panel for Nette\Database.
  *
  * @author     David Grudl
  */
@@ -47,7 +47,7 @@ class ConnectionPanel extends Nette\Object implements Nette\Diagnostics\IBarPane
 	public static function initialize(Connection $connection)
 	{
 		if (!Debugger::$productionMode) {
-			$panel = new self;
+			$panel = new static;
 			$connection->onQuery[] = callback($panel, 'logQuery');
 			Debugger::$bar->addPanel($panel);
 			Debugger::$blueScreen->addPanel(callback($panel, 'renderException'), __CLASS__);
@@ -108,7 +108,7 @@ class ConnectionPanel extends Nette\Object implements Nette\Diagnostics\IBarPane
 			$explain = NULL; // EXPLAIN is called here to work SELECT FOUND_ROWS()
 			if ($this->explain && preg_match('#\s*SELECT\s#iA', $sql)) {
 				try {
-				    $explain = $connection->queryArgs('EXPLAIN ' . $sql, $params)->fetchAll();
+					$explain = $connection->queryArgs('EXPLAIN ' . $sql, $params)->fetchAll();
 				} catch (\PDOException $e) {}
 			}
 
@@ -136,15 +136,12 @@ class ConnectionPanel extends Nette\Object implements Nette\Diagnostics\IBarPane
 				$s .= "</table>";
 			}
 			if ($source) {
-				list($file, $line) = $source;
-				$s .= (Debugger::$editor ? "<a href='{$h(Nette\Diagnostics\Helpers::editorLink($file, $line))}'" : '<span')
-					. " class='nette-DbConnectionPanel-source' title='{$h($file)}:$line'>"
-					. "{$h(basename(dirname($file)) . '/' . basename($file))}:$line" . (Debugger::$editor ? '</a>' : '</span>');
+				$s .= Nette\Diagnostics\Helpers::editorLink($source[0], $source[1])->class('nette-DbConnectionPanel-source');
 			}
 
 			$s .= '</td><td>';
 			foreach ($params as $param) {
-				$s .= "{$h(Nette\Utils\Strings::truncate($param, self::$maxLength))}<br>";
+				$s .= Debugger::dump($param, TRUE);
 			}
 
 			$s .= '</td><td>' . $rows . '</td></tr>';

@@ -117,7 +117,7 @@ final class Rules extends Nette\Object implements \IteratorAggregate
 		$this->adjustOperation($rule);
 		$rule->arg = $arg;
 		$rule->type = Rule::CONDITION;
-		$rule->subRules = new self($this->control);
+		$rule->subRules = new static($this->control);
 		$rule->subRules->parent = $this;
 
 		$this->rules[] = $rule;
@@ -134,7 +134,7 @@ final class Rules extends Nette\Object implements \IteratorAggregate
 	{
 		$rule = clone end($this->parent->rules);
 		$rule->isNegative = !$rule->isNegative;
-		$rule->subRules = new self($this->parent->control);
+		$rule->subRules = new static($this->parent->control);
 		$rule->subRules->parent = $this->parent;
 		$this->parent->rules[] = $rule;
 		return $rule->subRules;
@@ -175,7 +175,9 @@ final class Rules extends Nette\Object implements \IteratorAggregate
 	public function validate($onlyCheck = FALSE)
 	{
 		foreach ($this->rules as $rule) {
-			if ($rule->control->isDisabled()) continue;
+			if ($rule->control->isDisabled()) {
+				continue;
+			}
 
 			$success = ($rule->isNegative xor $this->getCallback($rule)->invoke($rule->control, $rule->arg));
 

@@ -15,8 +15,7 @@ use Nette,
 	Nette\Application,
 	Nette\Application\Responses,
 	Nette\Http,
-	Nette\Reflection,
-	Nette\Environment;
+	Nette\Reflection;
 
 
 
@@ -103,7 +102,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 	/** @var array */
 	private $lastCreatedRequestFlag;
 
-	/** @var Nette\DI\IContext */
+	/** @var Nette\DI\IContainer */
 	private $context;
 
 
@@ -159,7 +158,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 			$this->initGlobalParams();
 			$this->startup();
 			if (!$this->startupCheck) {
-				$class = $this->reflection->getMethod('startup')->getDeclaringClass()->getName();
+				$class = $this->getReflection()->getMethod('startup')->getDeclaringClass()->getName();
 				throw new Nette\InvalidStateException("Method $class::startup() or its descendant doesn't call parent::startup().");
 			}
 			// calls $this->action<Action>()
@@ -268,7 +267,9 @@ abstract class Presenter extends Control implements Application\IPresenter
 	 */
 	public function processSignal()
 	{
-		if ($this->signal === NULL) return;
+		if ($this->signal === NULL) {
+			return;
+		}
 
 		$component = $this->signalReceiver === '' ? $this : $this->getComponent($this->signalReceiver, FALSE);
 		if ($component === NULL) {
@@ -413,10 +414,12 @@ abstract class Presenter extends Control implements Application\IPresenter
 	public function sendTemplate()
 	{
 		$template = $this->getTemplate();
-		if (!$template) return;
+		if (!$template) {
+			return;
+		}
 
 		if ($template instanceof Nette\Templating\IFileTemplate && !$template->getFile()) { // content template
-			$files = $this->formatTemplateFiles($this->getName(), $this->view);
+			$files = $this->formatTemplateFiles();
 			foreach ($files as $file) {
 				if (is_file($file)) {
 					$template->setFile($file);
@@ -425,13 +428,14 @@ abstract class Presenter extends Control implements Application\IPresenter
 			}
 
 			if (!$template->getFile()) {
-				$file = str_replace(Environment::getVariable('appDir'), "\xE2\x80\xA6", reset($files));
+				$file = preg_replace('#^.*([/\\\\].{1,70})$#U', "\xE2\x80\xA6\$1", reset($files));
+				$file = strtr($file, '/', DIRECTORY_SEPARATOR);
 				throw new Application\BadRequestException("Page not found. Missing template '$file'.");
 			}
 		}
 
 		if ($this->layout !== FALSE) { // layout template
-			$files = $this->formatLayoutTemplateFiles($this->getName(), $this->layout ? $this->layout : 'layout');
+			$files = $this->formatLayoutTemplateFiles();
 			foreach ($files as $file) {
 				if (is_file($file)) {
 					$template->layout = $file;
@@ -441,7 +445,8 @@ abstract class Presenter extends Control implements Application\IPresenter
 			}
 
 			if (empty($template->layout) && $this->layout !== NULL) {
-				$file = str_replace(Environment::getVariable('appDir'), "\xE2\x80\xA6", reset($files));
+				$file = preg_replace('#^.*([/\\\\].{1,70})$#U', "\xE2\x80\xA6\$1", reset($files));
+				$file = strtr($file, '/', DIRECTORY_SEPARATOR);
 				throw new Nette\FileNotFoundException("Layout not found. Missing template '$file'.");
 			}
 		}
@@ -453,25 +458,25 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 	/**
 	 * Formats layout template file names.
-	 * @param  string
-	 * @param  string
 	 * @return array
 	 */
-	public function formatLayoutTemplateFiles($presenter, $layout)
+	public function formatLayoutTemplateFiles()
 	{
-		$appDir = Environment::getVariable('appDir');
-		$path = '/' . str_replace(':', 'Module/', $presenter);
-		$pathP = substr_replace($path, '/templates', strrpos($path, '/'), 0);
+		$name = $this->getName();
+		$presenter = substr($name, strrpos(':' . $name, ':'));
+		$layout = $this->layout ? $this->layout : 'layout';
+		$dir = dirname(dirname($this->getReflection()->getFileName()));
 		$list = array(
-			"$appDir$pathP/@$layout.latte",
-			"$appDir$pathP.@$layout.latte",
-			"$appDir$pathP/@$layout.phtml",
-			"$appDir$pathP.@$layout.phtml",
+			"$dir/templates/$presenter/@$layout.latte",
+			"$dir/templates/$presenter.@$layout.latte",
+			"$dir/templates/$presenter/@$layout.phtml",
+			"$dir/templates/$presenter.@$layout.phtml",
 		);
-		while (($path = substr($path, 0, strrpos($path, '/'))) !== FALSE) {
-			$list[] = "$appDir$path/templates/@$layout.latte";
-			$list[] = "$appDir$path/templates/@$layout.phtml";
-		}
+		do {
+			$list[] = "$dir/templates/@$layout.latte";
+			$list[] = "$dir/templates/@$layout.phtml";
+			$dir = dirname($dir);
+		} while ($dir && ($name = substr($name, 0, strrpos($name, ':'))));
 		return $list;
 	}
 
@@ -479,22 +484,18 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 	/**
 	 * Formats view template file names.
-	 * @param  string
-	 * @param  string
 	 * @return array
 	 */
-	public function formatTemplateFiles($presenter, $view)
+	public function formatTemplateFiles()
 	{
-		$appDir = Environment::getVariable('appDir');
-		$path = '/' . str_replace(':', 'Module/', $presenter);
-		$pathP = substr_replace($path, '/templates', strrpos($path, '/'), 0);
-		$path = substr_replace($path, '/templates', strrpos($path, '/'));
+		$name = $this->getName();
+		$presenter = substr($name, strrpos(':' . $name, ':'));
+		$dir = dirname(dirname($this->getReflection()->getFileName()));
 		return array(
-			"$appDir$pathP/$view.latte",
-			"$appDir$pathP.$view.latte",
-			"$appDir$pathP/$view.phtml",
-			"$appDir$pathP.$view.phtml",
-			"$appDir$path/@global.$view.phtml", // deprecated
+			"$dir/templates/$presenter/$this->view.latte",
+			"$dir/templates/$presenter.$this->view.latte",
+			"$dir/templates/$presenter/$this->view.phtml",
+			"$dir/templates/$presenter.$this->view.phtml",
 		);
 	}
 
@@ -713,10 +714,6 @@ abstract class Presenter extends Control implements Application\IPresenter
 	 */
 	public function lastModified($lastModified, $etag = NULL, $expire = NULL)
 	{
-		if (!Environment::isProduction()) {
-			return;
-		}
-
 		if ($expire !== NULL) {
 			$this->getHttpResponse()->setExpiration($expire);
 		}
@@ -935,7 +932,9 @@ abstract class Presenter extends Control implements Application\IPresenter
 		);
 		$this->lastCreatedRequestFlag = array('current' => $current);
 
-		if ($mode === 'forward') return;
+		if ($mode === 'forward') {
+			return;
+		}
 
 		// CONSTRUCT URL
 		$url = $router->constructUrl($this->lastCreatedRequest, $refUrl);
@@ -992,10 +991,14 @@ abstract class Presenter extends Control implements Application\IPresenter
 			}
 
 			if ($def === NULL) {
-				if ((string) $args[$name] === '') $args[$name] = NULL; // value transmit is unnecessary
+				if ((string) $args[$name] === '') {
+					$args[$name] = NULL; // value transmit is unnecessary
+				}
 			} else {
 				settype($args[$name], gettype($def));
-				if ($args[$name] === $def) $args[$name] = NULL;
+				if ($args[$name] === $def) {
+					$args[$name] = NULL;
+				}
 			}
 		}
 
@@ -1015,11 +1018,6 @@ abstract class Presenter extends Control implements Application\IPresenter
 	 */
 	protected function handleInvalidLink($e)
 	{
-		if (self::$invalidLinkMode === NULL) {
-			self::$invalidLinkMode = Environment::isProduction()
-				? self::INVALID_LINK_SILENT : self::INVALID_LINK_WARNING;
-		}
-
 		if (self::$invalidLinkMode === self::INVALID_LINK_SILENT) {
 			return '#';
 
@@ -1243,7 +1241,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 	 * Gets the context.
 	 * @return Presenter  provides a fluent interface
 	 */
-	public function setContext(Nette\DI\IContext $context)
+	public function setContext(Nette\DI\IContainer $context)
 	{
 		$this->context = $context;
 		return $this;
@@ -1253,7 +1251,7 @@ abstract class Presenter extends Control implements Application\IPresenter
 
 	/**
 	 * Gets the context.
-	 * @return Nette\DI\IContext
+	 * @return Nette\DI\IContainer
 	 */
 	final public function getContext()
 	{

@@ -105,8 +105,10 @@ class NetteLoader extends AutoLoader
 		'nette\deprecatedexception' => '/common/exceptions.php',
 		'nette\di\ambiguousserviceexception' => '/DI/AmbiguousServiceException.php',
 		'nette\di\configurator' => '/DI/Configurator.php',
-		'nette\di\context' => '/DI/Context.php',
-		'nette\di\icontext' => '/DI/IContext.php',
+		'nette\di\container' => '/DI/Container.php',
+		'nette\di\icontainer' => '/DI/IContainer.php',
+		'nette\di\iservicebuilder' => '/DI/IServiceBuilder.php',
+		'nette\di\servicebuilder' => '/DI/ServiceBuilder.php',
 		'nette\diagnostics\bar' => '/Diagnostics/Bar.php',
 		'nette\diagnostics\bluescreen' => '/Diagnostics/BlueScreen.php',
 		'nette\diagnostics\debugger' => '/Diagnostics/Debugger.php',
@@ -245,7 +247,7 @@ class NetteLoader extends AutoLoader
 	public static function getInstance()
 	{
 		if (self::$instance === NULL) {
-			self::$instance = new self;
+			self::$instance = new static;
 		}
 		return self::$instance;
 	}

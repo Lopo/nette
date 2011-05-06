@@ -91,7 +91,7 @@ class FileTemplate extends Template implements IFileTemplate
 		if ($storage instanceof PhpFileStorage) {
 			$storage->hint = str_replace(dirname(dirname($this->file)), '', $this->file);
 		}
-		$cached = $content = $cache[$this->file];
+		$cached = $content = $cache->load($this->file);
 
 		if ($content === NULL) {
 			try {
@@ -112,7 +112,7 @@ class FileTemplate extends Template implements IFileTemplate
 				)
 			);
 			$cache->release();
-			$cached = $cache[$this->file];
+			$cached = $cache->load($this->file);
 		}
 
 		if ($cached !== NULL && $storage instanceof PhpFileStorage) {
@@ -149,10 +149,7 @@ class FileTemplate extends Template implements IFileTemplate
 	public function getCacheStorage()
 	{
 		if ($this->cacheStorage === NULL) {
-			$dir = Nette\Environment::getVariable('tempDir') . '/cache';
-			umask(0000);
-			@mkdir($dir, 0777); // @ - directory may exists
-			$this->cacheStorage = new PhpFileStorage($dir);
+			return new Nette\Caching\Storages\DevNullStorage;
 		}
 		return $this->cacheStorage;
 	}

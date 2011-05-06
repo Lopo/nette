@@ -15,6 +15,11 @@ use Nette;
 
 
 
+require_once __DIR__ . '/Helpers.php';
+require_once __DIR__ . '/../Utils/Html.php';
+
+
+
 /**
  * Debugger: displays and logs errors.
  *
@@ -153,20 +158,19 @@ final class Debugger
 		}
 
 		self::$logger = new Logger;
-		self::$logger->directory = & self::$logDirectory;
-		self::$logger->email = & self::$email;
-		self::$logger->mailer = & self::$mailer;
-		Logger::$emailSnooze = & self::$emailSnooze;
+		self::$logDirectory = & self::$logger->directory;
+		self::$email = & self::$logger->email;
+		self::$mailer = & self::$logger->mailer;
+		self::$emailSnooze = & Logger::$emailSnooze;
 
 		self::$fireLogger = new FireLogger;
 
 		self::$blueScreen = new BlueScreen;
 		self::$blueScreen->addPanel(function($e) {
 			if ($e instanceof Nette\Templating\FilterException) {
-				$link = Helpers::editorLink($e->sourceFile, $e->sourceLine);
 				return array(
 					'tab' => 'Template',
-					'panel' => '<p><b>File:</b> ' . ($link ? '<a href="' . htmlspecialchars($link) . '">' : '') . htmlspecialchars($e->sourceFile) . ($link ? '</a>' : '')
+					'panel' => '<p><b>File:</b> ' . Helpers::editorLink($e->sourceFile, $e->sourceLine)
 					. '&nbsp; <b>Line:</b> ' . ($e->sourceLine ? $e->sourceLine : 'n/a') . '</p>'
 					. ($e->sourceLine ? '<pre>' . BlueScreen::highlightFile($e->sourceFile, $e->sourceLine) . '</pre>' : '')
 				);
@@ -358,7 +362,7 @@ final class Debugger
 	 */
 	public static function _shutdownHandler()
 	{
-		// 1) fatal error handler
+		// fatal error handler
 		static $types = array(
 			E_ERROR => 1,
 			E_CORE_ERROR => 1,
@@ -367,10 +371,10 @@ final class Debugger
 		);
 		$error = error_get_last();
 		if (isset($types[$error['type']])) {
-			self::_exceptionHandler(new Nette\FatalErrorException($error['message'], 0, $error['type'], $error['file'], $error['line'], NULL));
+			self::_exceptionHandler(new Nette\FatalErrorException($error['message'], 0, $error['type'], $error['file'], $error['line'], NULL), TRUE);
 		}
 
-		// 2) debug bar (require HTML & development mode)
+		// debug bar (require HTML & development mode)
 		if (self::$bar && !self::$productionMode && !self::$ajaxDetected && !self::$consoleMode
 			&& !preg_match('#^Content-Type: (?!text/html)#im', implode("\n", headers_list()))
 		) {
@@ -386,7 +390,7 @@ final class Debugger
 	 * @return void
 	 * @internal
 	 */
-	public static function _exceptionHandler(\Exception $exception)
+	public static function _exceptionHandler(\Exception $exception, $drawBar = FALSE)
 	{
 		if (!headers_sent()) { // for PHP < 5.2.4
 			header('HTTP/1.1 500 Internal Server Error');
@@ -411,7 +415,7 @@ final class Debugger
 
 				} elseif ($htmlMode) { // dump to browser
 					self::$blueScreen->render($exception);
-					if (self::$bar) {
+					if ($drawBar && self::$bar) {
 						self::$bar->render();
 					}
 
@@ -560,14 +564,23 @@ final class Debugger
 
 		$output = "<pre class=\"nette-dump\">" . Helpers::htmlDump($var) . "</pre>\n";
 
-		if (!$return && self::$showLocation) {
+		if (!$return) {
 			$trace = debug_backtrace();
-			$i = isset($trace[1]['class']) && $trace[1]['class'] === __CLASS__ ? 1 : 0;
-			if (isset($trace[$i]['file'], $trace[$i]['line'])) {
+			$i = !isset($trace[1]['class']) && isset($trace[1]['function']) && $trace[1]['function'] === 'dump' ? 1 : 0;
+			if (isset($trace[$i]['file'], $trace[$i]['line']) && is_file($trace[$i]['file'])) {
+				$lines = file($trace[$i]['file']);
+				preg_match('#dump\((.*)\)#', $lines[$trace[$i]['line'] - 1], $m);
 				$output = substr_replace(
 					$output,
-					' <small>' . htmlspecialchars("in file {$trace[$i]['file']} on line {$trace[$i]['line']}", ENT_NOQUOTES) . '</small>',
-					-8, 0);
+					' title="' . htmlspecialchars((isset($m[0]) ? "$m[0] \n" : '') . "in file {$trace[$i]['file']} on line {$trace[$i]['line']}") . '"',
+					4, 0);
+
+				if (self::$showLocation) {
+					$output = substr_replace(
+						$output,
+						' <small>in ' . Helpers::editorLink($trace[$i]['file'], $trace[$i]['line']) . ":{$trace[$i]['line']}</small>",
+						-8, 0);
+				}
 			}
 		}
 
